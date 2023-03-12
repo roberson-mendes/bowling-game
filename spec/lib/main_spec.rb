@@ -1,8 +1,10 @@
 require 'spec_helper'
 require 'main'
+require 'bowling/invalid_input_exception'
 
 RSpec.describe Main do
   let(:perfect) { file_fixture('perfect.txt') }
+  let(:empty)   { file_fixture('empty.txt') }
 
   context 'when input file is valid' do
     context 'with more than two players' do
@@ -22,6 +24,16 @@ RSpec.describe Main do
   end
 
   context 'when input file is invalid' do
+    context 'with empty file' do
+      it 'raises the corresponding error message' do
+        invalid_input_exception = Bowling::InvalidInputException
+    
+        subject = described_class.new(empty)
+    
+        expect{ subject.read_file }.to raise_exception(invalid_input_exception)
+      end
+    end
+
     context 'with invalid characters present' do
       xit 'raises the corresponding error message' do
       end
