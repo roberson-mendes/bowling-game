@@ -13,10 +13,23 @@ class Main
 
     def valid_inputs?
         return false if @results_file_path.empty?
-        #TODO: check whether the players inputs are corrects
+        return false unless valid_characteres?
         return false unless valid_scores?
 
         true
+    end
+
+    def valid_characteres?
+        @results_file_path.each_line do |line|
+            return false unless expected_format?(line)
+        end
+
+        true
+    end
+
+    def expected_format?(line)
+        name_tab_number = /^[a-zA-Z]+\t\d+$/
+        line.match?(name_tab_number)
     end
     
     def valid_scores?

@@ -7,6 +7,7 @@ RSpec.describe Main do
   let(:empty) { file_fixture('empty.txt') }
   let(:invalid_score) { file_fixture('invalid-score.txt') }
   let(:negative) { file_fixture('negative.txt') }
+  let(:free_text) { file_fixture('free-text.txt') }
 
   context 'when input file is valid' do
     context 'with more than two players' do
@@ -37,7 +38,12 @@ RSpec.describe Main do
     end
 
     context 'with invalid characters present' do
-      xit 'raises the corresponding error message' do
+      it 'raises the corresponding error message' do
+        invalid_input_exception = Bowling::InvalidInputException
+    
+        subject = described_class.new(free_text)
+    
+        expect{ subject.read_file }.to raise_exception(invalid_input_exception)
       end
     end
 
