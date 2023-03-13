@@ -27,43 +27,45 @@ RSpec.describe Main do
   end
 
   context 'when input file is invalid' do
+    let(:invalid_input_exception_class) { Bowling::InvalidInputException }
+    
     context 'with empty file' do
       it 'raises the corresponding error message' do
-        invalid_input_exception = Bowling::InvalidInputException
+        empty_exception_message = "File can't be empty."
     
         subject = described_class.new(empty)
     
-        expect{ subject.read_file }.to raise_exception(invalid_input_exception)
+        expect{ subject.read_file }.to raise_exception(invalid_input_exception_class, empty_exception_message)
       end
     end
 
     context 'with invalid characters present' do
       it 'raises the corresponding error message' do
-        invalid_input_exception = Bowling::InvalidInputException
-    
+        invalid_characteres_exception_message = "Invalid characteres. Each line must be <name><tab><score>"
+
         subject = described_class.new(free_text)
     
-        expect{ subject.read_file }.to raise_exception(invalid_input_exception)
+        expect{ subject.read_file }.to raise_exception(invalid_input_exception_class, invalid_characteres_exception_message)
       end
     end
 
     context 'with invalid score' do
       it 'raises the corresponding error message' do
-        invalid_input_exception = Bowling::InvalidInputException
-
+        invalid_score_error = "Invalid characteres. Each line must be <name><tab><score>"
+        
         subject = described_class.new(invalid_score)
 
-        expect{ subject.read_file }.to raise_exception(invalid_input_exception)
+        expect{ subject.read_file }.to raise_exception(invalid_input_exception_class, invalid_score_error)
       end
     end
 
     context 'with negative score' do
       it 'raises the corresponding error message' do
-        invalid_input_exception = Bowling::InvalidInputException
+        negative_score_error = "Invalid score. Score must be a number between 0 and 10"
 
         subject = described_class.new(negative)
 
-        expect{ subject.read_file }.to raise_exception(invalid_input_exception)
+        expect{ subject.read_file }.to raise_exception(invalid_input_exception_class, negative_score_error)
       end
     end
 
