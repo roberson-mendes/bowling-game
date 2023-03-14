@@ -1,3 +1,4 @@
+require 'pry-byebug'
 module Bowling
     module Validator
         class ScoreValidator
@@ -7,6 +8,7 @@ module Bowling
         
             def validate
                 @results_file_path.each_line do |line|
+                    line = line.chomp
                     validate_line_score(line)
                 end
             end
@@ -25,7 +27,8 @@ module Bowling
             end
             
             def valid_characteres?(line)
-                match_score_regex = /(-?\d+)$/
+                match_score_regex = /(-?\d+|[fxFX]|[\/])$/
+                
                 line.match?(match_score_regex)
             end
             
@@ -35,11 +38,14 @@ module Bowling
             end
         
             def get_score(line)
-                match_score_regex = /^[a-zA-Z]+\t(-?\d+)$/
+                match_score_regex = /^[a-zA-Z]+\t(-?\d+|[fxFX]|[\/])$/
+
                 line.match(match_score_regex)[1]
             end
         
             def in_valid_range?(score)
+                #once the values is 'F', 'x' or '/' it is converted to 0
+                #and this test passes
                 (0..10).include?(score.to_i)
             end
         end
