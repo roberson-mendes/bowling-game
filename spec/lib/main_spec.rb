@@ -36,7 +36,7 @@ RSpec.describe Main do
         )
       end
 
-      it 'processes the game score rules' do
+      xit 'processes the game score rules' do
       end
       
       context 'with one player' do
@@ -54,9 +54,6 @@ RSpec.describe Main do
           )
         end
 
-        it 'processes the game score rules' do
-        end
-
         context 'and game rules are invalid' do
           context 'with invalid number of throwings' do
             xit 'raises the corresponding error message' do
@@ -65,9 +62,6 @@ RSpec.describe Main do
         end
 
         context 'and game rules are valid' do
-          it 'calculates the score' do
-          end
-
           context 'with strikes in all throwings' do
             xit 'prints a perfect game scoreboard' do
             end
@@ -81,9 +75,6 @@ RSpec.describe Main do
       end
 
       context 'with more than two players' do
-        xit 'calculates the game score' do
-        end
-        
         xit 'prints the game scoreboard to stdout' do
         end
       end

@@ -18,9 +18,8 @@ class Main
         end
 
         players_scores
-        #pass each player score to game rules to take its scores
+        #pass each player and throwings to game rules to take its scores
         #calculate game rules
-            #validate throwings
         #print computed scores
     end
 

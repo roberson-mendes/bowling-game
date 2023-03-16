@@ -1,4 +1,3 @@
-require 'pry-byebug'
 module Bowling
     module Validator
         class ScoreValidator

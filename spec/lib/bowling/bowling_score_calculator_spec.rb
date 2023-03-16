@@ -1,5 +1,4 @@
 require 'bowling/bowling_score_calculator'
-require 'pry'
 
 RSpec.describe Bowling::BowlingScoreCalculator do
   context 'and game rules are invalid' do
