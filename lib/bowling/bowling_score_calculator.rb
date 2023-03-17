@@ -1,18 +1,20 @@
 require 'bowling/chances_validator'
-
+require 'bowling/pinfalls_mapper'
 module Bowling
     class BowlingScoreCalculator
         MAX_PINS = 10
         STRIKE_SCORE = 10
         MAX_CHANCES = 20
     
-        def initialize(player, chances, overrides = {})
-            @player = player
-            @chances = convert_to_numbers(chances)
+        def initialize(chances, overrides = {})
             @bonus_chances = 0
             @strikes = 0
             @total_score = 0
             @frames_scores = {}
+            @pinfalls_mapper = overrides.fetch(:score_mapper) do
+                Bowling::PinfallsMapper
+            end
+            @chances = @pinfalls_mapper.to_numbers(chances)
             @chances_validator = overrides.fetch(:chances_validator) do
                 Bowling::ChancesValidator.new(@chances)
             end

@@ -5,10 +5,9 @@ RSpec.describe Bowling::BowlingScoreCalculator do
     context 'with less throwings than the allowed' do
       it 'raises the corresponding error message' do
         expected_error = "Less chances then the required by bowling rules."
-        player = "Carl"
         chances = ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"]
 
-        subject = described_class.new(player, chances)
+        subject = described_class.new(chances)
 
         expect { subject.calculate }.to raise_exception(expected_error)
       end
@@ -17,11 +16,10 @@ RSpec.describe Bowling::BowlingScoreCalculator do
     context 'with more throwings than the allowed' do
       it 'raises the corresponding error message' do
         expected_error = "More chances then the required by bowling rules."
-        player = "Carl"
         chances = ["10", "10", "10", "10", "10", "10", "10", "10", "10", 
           "10", "10", "10", "10"]
 
-        subject = described_class.new(player, chances)
+        subject = described_class.new(chances)
 
         expect { subject.calculate }.to raise_exception(expected_error)
       end
@@ -44,11 +42,10 @@ RSpec.describe Bowling::BowlingScoreCalculator do
           9 => 148,
           10 => 167
         }
-        player = "Carl"
         chances = ["X", "7", "3", "9", "F", "x", "f", "8", "8", "2", "0", "6", "10", "10",
             "10", "8", "1"]
         
-        subject = described_class.new(player, chances).calculate
+        subject = described_class.new(chances).calculate
 
         expect(subject).to eq(expected_score)
       end
@@ -67,11 +64,10 @@ RSpec.describe Bowling::BowlingScoreCalculator do
           9 => 148,
           10 => 167
       }
-      player = "Carl"
       chances = ["10", "7", "3", "9", "0", "10", "0", "8", "8", "2", "0", "6", "10", "10",
           "10", "8", "1"]
       
-      subject = described_class.new(player, chances).calculate
+      subject = described_class.new(chances).calculate
 
       expect(subject).to eq(expected_score)
     end
@@ -90,11 +86,10 @@ RSpec.describe Bowling::BowlingScoreCalculator do
               9 => 270,
               10 => 300
           }
-          player = "Carl"
           chances = ["10", "10", "10", "10", "10", "10", "10", "10", "10", "10", "10", 
             "10"]
 
-          subject = described_class.new(player, chances).calculate
+          subject = described_class.new(chances).calculate
 
           expect(subject).to eq(expected_score)
       end
@@ -114,11 +109,10 @@ RSpec.describe Bowling::BowlingScoreCalculator do
           9 => 0,
           10 => 0
         }
-        player = "Carl"
         chances = ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", 
           "0", "0", "0", "0", "0", "0", "0"]
 
-        subject = described_class.new(player, chances).calculate
+        subject = described_class.new(chances).calculate
 
         expect(subject).to eq(expected_score)
       end
