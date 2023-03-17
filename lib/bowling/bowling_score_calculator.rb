@@ -13,7 +13,10 @@ module Bowling
         def initialize(chances, overrides = {})
             @bonus_chances = 0
             @total_score = 0
-            @frames_scores = {}
+            @frames_scores = {
+                'frames_score' => {},
+                'score_by_frame' => []
+            }
             @pinfalls_mapper = overrides.fetch(:score_mapper) do
                 Bowling::PinfallsMapper
             end
@@ -47,14 +50,26 @@ module Bowling
                         if strike?(actual_chance)
                             frame_score = @strike.score_for(actual_chance, 
                                 @chances)
+                            @frames_scores['score_by_frame'] << ['strike', 'X']
                             actual_chance += step_1
                         elsif spare?(actual_chance)
                             frame_score = @spare.score_for(actual_chance, 
                                 @chances)
+                            pinsfalls = @chances[actual_chance]
+                            #convert to characters
+                            pinfalls = 'F' if pinfalls == 0
+                            @frames_scores['score_by_frame'] << [pinsfalls, '/']
                             actual_chance += step_2
                         else
                             frame_score = @regular.score_for(actual_chance,
                                 @chances)
+                            actual_pinsfalls = @chances[actual_chance]
+                            next_pinsfalls = @chances[actual_chance + 1]
+                            #convert into characteres
+                            actual_pinsfalls = 'F' if actual_pinsfalls == 0
+                            next_pinsfalls = 'F' if next_pinsfalls == 0
+                            @frames_scores['score_by_frame'] << 
+                                [actual_pinsfalls, next_pinsfalls]
                             actual_chance += step_2
                         end
         
@@ -118,14 +133,54 @@ module Bowling
             skip_2 = actual_chance + 2
             next_score = @chances[skip_1]
             last_score = @chances[skip_2]
-    
+
+            #convert into characteres
+            #if strikes
+            actual_score = 'X' if actual_score == 10
+            next_score = 'X' if next_score == 10
+            last_score = 'X' if last_score == 10
+            #if fouls
+            actual_score = 'F' if actual_score == 0
+            next_score = 'F' if next_score == 0
+            last_score = 'F' if last_score == 0 || last_score == nil
+            
             if strike?(actual_chance)
+                @frames_scores['score_by_frame'] << ['X', next_score, 
+                    last_score]
+                #convert into numbers to sum framescore
+                    #if strikes
+                next_score = 10 if next_score == 'X'
+                last_score = 10 if last_score == 'X'
+                    #if fouls
+                next_score = 0 if next_score == 'F'
+                last_score = 0 if last_score == 'F'
+                #increment frame_score
                 frame_score += STRIKE_SCORE + next_score + last_score
+                #increments bonus chance
                 @bonus_chances += 1
             elsif spare?(actual_chance)
+                @frames_scores['score_by_frame'] << [actual_score, '/', 
+                    last_score]
+                #convert into numbers to sum framescore
+                    #if strikes
+                last_score = 10 if last_score == 'X'
+                    #if fouls
+                last_score = 0 if last_score == 'F'
+                #increment frame_score
                 frame_score += STRIKE_SCORE + last_score
+                #increments bonus chance
                 @bonus_chances += 1
             else
+                @frames_scores['score_by_frame'] << [actual_score, next_score, 
+                    'F']
+                #convert into numbers to sum framescore
+                    #if strikes
+                actual_score = 10 if actual_score == 'X'
+                next_score = 10 if next_score == 'X'
+                    #if fouls
+                actual_score = 0 if actual_score == 'F'
+                next_score = 0 if next_score == 'F'
+                #increment frame score
                 frame_score += actual_score + next_score
             end
     
@@ -133,7 +188,7 @@ module Bowling
         end
         
         def build_frames_scores(actual_frame)
-            @frames_scores[actual_frame] = @total_score
+            @frames_scores['frames_score'][actual_frame] = @total_score
         end
     end
 end

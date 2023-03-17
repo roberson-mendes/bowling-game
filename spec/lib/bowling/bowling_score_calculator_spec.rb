@@ -31,19 +31,24 @@ RSpec.describe Bowling::BowlingScoreCalculator do
     context 'with characteres scores' do
       it 'convert characteres into integer scores' do
         expected_score = {
-          1 => 20,
-          2 => 39,
-          3 => 48,
-          4 => 66,
-          5 => 74,
-          6 => 84,
-          7 => 90,
-          8 => 120,
-          9 => 148,
-          10 => 167
+          'frames_score' => {
+            1 => 20,
+            2 => 39,
+            3 => 48,
+            4 => 66,
+            5 => 74,
+            6 => 84,
+            7 => 90,
+            8 => 120,
+            9 => 148,
+            10 => 167
+          },
+          'score_by_frame' => [['strike', 'X'], [7, '/'], [9, 'F'], ['strike', 'X'], 
+            ['F', 8], [8, '/'], ['F', 6], ['strike', 'X'], ['strike', 'X'], 
+            ['X', 8, 1]]
         }
-        chances = ["X", "7", "3", "9", "F", "x", "f", "8", "8", "2", "0", "6", "10", "10",
-            "10", "8", "1"]
+        chances = ["X", "7", "3", "9", "F", "x", "f", "8", "8", "2", "0", "6",
+           "10", "10", "10", "8", "1"]
         
         subject = described_class.new(chances).calculate
 
@@ -53,19 +58,24 @@ RSpec.describe Bowling::BowlingScoreCalculator do
 
     it 'calculates the score' do
       expected_score = {
-          1 => 20,
-          2 => 39,
-          3 => 48,
-          4 => 66,
-          5 => 74,
-          6 => 84,
-          7 => 90,
-          8 => 120,
-          9 => 148,
-          10 => 167
+          'frames_score' => {
+            1 => 20,
+            2 => 39,
+            3 => 48,
+            4 => 66,
+            5 => 74,
+            6 => 84,
+            7 => 90,
+            8 => 120,
+            9 => 148,
+            10 => 167
+          },
+          'score_by_frame' => [['strike', 'X'], [7, '/'], [9, 'F'], 
+            ['strike', 'X'], ['F', 8], [8, '/'], ['F', 6], ['strike', 'X'], 
+            ['strike', 'X'], ['X', 8, 1]]
       }
-      chances = ["10", "7", "3", "9", "0", "10", "0", "8", "8", "2", "0", "6", "10", "10",
-          "10", "8", "1"]
+      chances = ["10", "7", "3", "9", "0", "10", "0", "8", "8", "2", "0", "6", 
+        "10", "10", "10", "8", "1"]
       
       subject = described_class.new(chances).calculate
 
@@ -75,6 +85,7 @@ RSpec.describe Bowling::BowlingScoreCalculator do
     context 'with strikes in all throwings' do
       it 'calculates the score correctly' do
           expected_score = {
+            'frames_score' => {
               1 => 30,
               2 => 60,
               3 => 90,
@@ -85,9 +96,13 @@ RSpec.describe Bowling::BowlingScoreCalculator do
               8 => 240,
               9 => 270,
               10 => 300
+            },
+            'score_by_frame' => [['strike', 'X'], ['strike', 'X'], ['strike', 'X'], 
+              ['strike', 'X'], ['strike', 'X'], ['strike', 'X'], ['strike', 'X'], 
+              ['strike', 'X'], ['strike', 'X'], ['X', 'X', 'X']]
           }
-          chances = ["10", "10", "10", "10", "10", "10", "10", "10", "10", "10", "10", 
-            "10"]
+          chances = ["10", "10", "10", "10", "10", "10", "10", "10", "10", "10", 
+            "10", "10"]
 
           subject = described_class.new(chances).calculate
 
@@ -98,19 +113,24 @@ RSpec.describe Bowling::BowlingScoreCalculator do
     context 'with fouls in all throwings' do
       it 'calculates the score correctly' do
         expected_score = {
-          1 => 0,
-          2 => 0,
-          3 => 0,
-          4 => 0,
-          5 => 0,
-          6 => 0,
-          7 => 0,
-          8 => 0,
-          9 => 0,
-          10 => 0
+          'frames_score' => {
+            1 => 0,
+            2 => 0,
+            3 => 0,
+            4 => 0,
+            5 => 0,
+            6 => 0,
+            7 => 0,
+            8 => 0,
+            9 => 0,
+            10 => 0
+          },
+          'score_by_frame' => [['F', 'F'], ['F', 'F'], ['F', 'F'], 
+            ['F', 'F'], ['F', 'F'], ['F', 'F'], ['F', 'F'], 
+            ['F', 'F'], ['F', 'F'], ['F', 'F', 'F']]
         }
-        chances = ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", 
-          "0", "0", "0", "0", "0", "0", "0"]
+        chances = ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", 
+          "0", "0", "0", "0", "0", "0", "0", "0"]
 
         subject = described_class.new(chances).calculate
 
