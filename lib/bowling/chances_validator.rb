@@ -17,6 +17,7 @@ module Bowling
       
         def validate_chances_quantity(strikes, bonus_chances)
           chances_quantity = @scores.size
+          # binding.pry
           actual_max_chances = (MAX_CHANCES - strikes + bonus_chances)
 
           if chances_quantity > actual_max_chances
