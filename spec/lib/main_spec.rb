@@ -2,65 +2,39 @@ require 'spec_helper'
 require 'main'
 require 'bowling/validator/invalid_input_exception'
 require 'bowling/input_validator'
+require 'bowling/file_processor'
 
 RSpec.describe Main do
   let(:perfect) { file_fixture('perfect.txt') }
   let(:scores) { file_fixture('scores.txt') }
   
   context 'when starts the program' do
-    it 'validate the input rules' do
-      input_validator = spy(Bowling::InputValidator)
+    it 'instantiate file processor' do
+      file_processor = spy(Bowling::FileProcessor)
 
-      subject = described_class.new(perfect, input_validator).read_file
+      subject = described_class.new(perfect, file_processor).read_file
       
-      expect(input_validator).to have_received(:validate)
+      expect(file_processor).to have_received(:new).with(perfect)
+    end
+
+    it 'calls fileprocessor get_players_scores to process the file' do
+      file_processor = spy(Bowling::FileProcessor)
+
+      subject = described_class.new(perfect, file_processor).read_file
+      
+      expect(file_processor).to have_received(:get_players_scores)
     end
 
     context 'when input file is invalid' do
-      xit 'displays the file error' do
+      xit 'prints the file error' do
       end
     end
 
     context 'when input file is valid' do
-      it 'get the players scores' do
-        input_validator = instance_double(Bowling::InputValidator)
-        allow(input_validator).to receive(:validate)
-        separated_score = { 
-          "Carl" => ["10", "10", "10", "10", "10", "10", "10", "10", "10", "10",
-            "10", "10"] 
-        }
-
-        subject = described_class.new(perfect, input_validator).read_file
-
-        expect(subject).to eq({ 
-          "Carl" => ["10", "10", "10", "10", "10", "10", "10", "10", "10", "10",
-            "10", "10"] }
-        )
-      end
-
-      xit 'processes the game score rules' do
-      end
-      
       context 'with one player' do
-        it 'get the players scores' do
-          input_validator = instance_double(Bowling::InputValidator)
-          allow(input_validator).to receive(:validate)
-          separated_score = { 
-            "Carl" => ["10", "10", "10", "10", "10", "10", "10", "10", "10",
-              "10", "10", "10"] 
-          }
-  
-          subject = described_class.new(perfect, input_validator).read_file
-
-          expect(subject).to eq({ 
-            "Carl" => ["10", "10", "10", "10", "10", "10", "10", "10", "10",
-              "10", "10", "10"] }
-          )
-        end
-
         context 'and game rules are invalid' do
           context 'with invalid number of throwings' do
-            xit 'raises the corresponding error message' do
+            xit 'prints the corresponding error message' do
             end
           end
         end

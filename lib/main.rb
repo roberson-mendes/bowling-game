@@ -1,35 +1,20 @@
-require_relative 'bowling/validator/invalid_input_exception'
-
+require 'bowling/file_processor'
 class Main
-    def initialize(results_file_path = nil, input_validator = nil)
-        @results_file_path = results_file_path
-        @input_validator = input_validator
-    end
+  def initialize(
+    results_file_path = nil,
+    file_processor = Bowling::FileProcessor
+  )
+    @results_file_path = results_file_path
+    @file_processor = file_processor.new(@results_file_path)
+  end
 
-    def read_file
-        @input_validator.validate
+  def read_file
+    @file_processor.validate
 
-        #separate player and throwings from each line
-        players_scores = {}
-        @results_file_path.each_line do |line|
-          score_line = get_player_scores(line)
-          players_scores[score_line[:name]] ||= []
-          players_scores[score_line[:name]] << score_line[:pins]
-        end
-
-        players_scores
-        #pass each player and throwings to game rules to take its scores
-        #calculate game rules
-        #print computed scores
-    end
-
-    def get_player_scores(line)
-        player_infos = line.chomp.split("\t")
-        
-        {
-            name: player_infos[0],
-            pins: player_infos[1] 
-        }
-    end
+    #separate player and throwings from each line
+    @file_processor.get_players_scores
+    #pass each player and throwings to game rules to take its scores
+    #calculate game rules
+    #print computed scores
+  end
 end
-  
