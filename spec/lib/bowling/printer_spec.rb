@@ -1,101 +1,171 @@
-require 'bowling/printer'
+require "bowling/printer"
+require "pry-byebug"
 
 RSpec.describe Bowling::Printer do
-    context 'when prints a valid input' do
-        context 'with one player' do
-            it 'prints frames head on first line' do
-                frames_head = "Frame\t\t1\t\t2\t\t3\t\t4\t\t5\t\t6\t\t7\t\t8" +
-                    "\t\t9\t\t10\n"
-                players_final_scores = [
-                    {
-                        'name' => 'Carl',
-                        'pinfalls' => ["X", "7", "3", "9", "F", "x", "f", "8",
-                            "8", "2", "0", "6", "10", "10","10", "8", "1"],
-                        'frames_scores' => {
-                            1 => 20,
-                            2 => 39,
-                            3 => 48,
-                            4 => 66,
-                            5 => 74,
-                            6 => 84,
-                            7 => 90,
-                            8 => 120,
-                            9 => 148,
-                            10 => 167
-                        }
-                    }
-                ]
+  context "when prints a valid input" do
+    context "with one player" do
+      subject { described_class.new(players_final_scores).print }
 
-                subject = described_class.new(players_final_scores).print
+      context "and all scores are fouls" do
+        let(:players_final_scores) { build_foul_player }
 
-                
-                expect(get_head(subject)).to eq(frames_head)
-            end
-    
-            it 'prints players name on second line' do
-                player_name = "Carl"
-                players_final_scores = [
-                    {
-                        'name' => 'Carl',
-                        'pinfalls' => ["X", "7", "3", "9", "F", "x", "f", "8",
-                            "8", "2", "0", "6", "10", "10","10", "8", "1"],
-                        'frames_scores' => {
-                            1 => 20,
-                            2 => 39,
-                            3 => 48,
-                            4 => 66,
-                            5 => 74,
-                            6 => 84,
-                            7 => 90,
-                            8 => 120,
-                            9 => 148,
-                            10 => 167
-                        }
-                    }
-                ]
+        it "prints scores correctly" do
+          expected_display =
+            "Frame\t\t1\t\t2\t\t3\t\t4\t\t5\t\t6\t\t7\t\t8\t\t9\t\t10\n" +
+            "Carl\n" +
+            "Pinfalls\tF\tF\tF\tF\tF\tF\tF\tF\tF\tF\tF\tF\tF\tF\tF\tF\tF\tF\t" +
+              "F\tF\n" +
+            "Score\t\t0\t\t0\t\t0\t\t0\t\t0\t\t0\t\t0\t\t0\t\t0\t\t0\n"
 
-                subject = described_class.new(players_final_scores).print
-
-                
-                expect(get_name(subject)).to eq(player_name)
-            end
-            
-            xit 'prints pinfalls on third line' do
-    
-            end
-    
-            xit 'prints pinfalls on third line' do
-    
-            end
-    
-            xit 'prints frame score on third line' do 
-            end
-    
-            xit 'formats the output to show "X" on strikes' do
-            end
-    
-            xit 'formats the output to show "\" on spares' do
-            end
-    
-            xit 'formats the output to show "F" on fouls' do
-            end
+          expect(subject).to eq(expected_display)
         end
+      end
 
-        context 'with two or more players' do
-            xit 'prints the expected scores' do
-            end
+      context "and all scores are strikes" do
+        let(:players_final_scores) { build_strike_player }
+
+        it "prints scores correctly" do
+          expected_display = 
+            "Frame\t\t1\t\t2\t\t3\t\t4\t\t5\t\t6\t\t7\t\t8\t\t9\t\t10\n" +
+            "Carl\n" +
+            "Pinfalls\t\t\tX\t\t\tX\t\t\tX\t\t\tX\t\t\tX\t\t\tX\t\t\tX\t\t\tX" +
+              "\t\t\tX\tX\tX\tX\n" +
+            "Score\t\t30\t\t60\t\t90\t\t120\t\t150\t\t180\t\t210\t\t240\t\t" +
+              "270\t\t300\n"
+
+          expect(subject).to eq(expected_display)
         end
+      end
+
+      context "and there are normal scores" do
+        let(:players_final_scores) { build_regular_player }
+        
+        it "prints scores correctly" do
+          expected_display =
+            "Frame\t\t1\t\t2\t\t3\t\t4\t\t5\t\t6\t\t7\t\t8\t\t9\t\t10\n" +
+            "John\n" +
+            "Pinfalls\t3\t/\t6\t3\t\t\tX\t8\t1\t\t\tX\t\t\tX\t9\tF\t7\t/\t4" +
+              "\t4\tX\t9\tF\n" +
+            "Score\t\t16\t\t25\t\t44\t\t53\t\t82\t\t101\t\t110\t\t124\t\t" +
+              "132\t\t151\n"
+
+            expect(subject).to eq(expected_display)
+        end
+      end
     end
 
-    def get_head(score_display)
-        frame_numbers_newline = /^Frame.+\n/
-        score_display.match(frame_numbers_newline)[0]
+    context "with two or more players" do
+      xit "prints the expected scores" do
+      end
     end
+  end
 
-    def get_name(score_display)
-        lines = score_display.split("\n")
-        name_position = 1
+  def get_head(score_display)
+    frame_numbers_newline = /^Frame.+\n/
+    score_display.match(frame_numbers_newline)[0]
+  end
 
-        lines[name_position]
-    end
+  def get_name(score_display)
+    lines = score_display.split("\n")
+    name_position = 1
+
+    lines[name_position]
+  end
+
+  def pinfalls_display(score_display)
+    lines = score_display.split("\n")
+    pinfalls_position = 2
+
+    lines[pinfalls_position]
+  end
+
+  def frame_score_display(score_display)
+    lines = score_display.split("\n")
+    pinfalls_position = 3
+
+    lines[pinfalls_position]
+  end
+
+  def build_strike_player
+    [
+      {
+        "name" => "Carl",
+        "scores" => {
+          "frames_score" => {
+            1 => 30,
+            2 => 60,
+            3 => 90,
+            4 => 120,
+            5 => 150,
+            6 => 180,
+            7 => 210,
+            8 => 240,
+            9 => 270,
+            10 => 300
+          },
+          "score_by_frame" => [
+            ["strike", "X"], ["strike", "X"],
+            ["strike", "X"], ["strike", "X"],
+            ["strike", "X"], ["strike", "X"],
+            ["strike", "X"], ["strike", "X"],
+            ["strike", "X"], ["X", "X", "X"],
+          ],
+        },
+      },
+    ]
+  end
+
+  def build_foul_player
+    [
+      {
+        "name" => "Carl",
+        "scores" => {
+          "frames_score" => {
+            1 => 0,
+            2 => 0,
+            3 => 0,
+            4 => 0,
+            5 => 0,
+            6 => 0,
+            7 => 0,
+            8 => 0,
+            9 => 0,
+            10 => 0,
+          },
+          "score_by_frame" => [
+            ["F", "F"], ["F", "F"], ["F", "F"],
+            ["F", "F"], ["F", "F"], ["F", "F"],
+            ["F", "F"], ["F", "F"], ["F", "F"],
+            ["F", "F", nil],
+          ],
+        },
+      },
+    ]
+  end
+
+  def build_regular_player
+    [
+      {
+        "name" => "John",
+        "scores" => {
+          "frames_score" => {
+            1 => 16,
+            2 => 25,
+            3 => 44,
+            4 => 53,
+            5 => 82,
+            6 => 101,
+            7 => 110,
+            8 => 124,
+            9 => 132,
+            10 => 151
+          },
+          "score_by_frame" => [
+            [3, '/'], [6, 3], ['strike', 'X'], [8, 1], ['strike', 'X'], 
+            ['strike', 'X'], [9, 'F'], [7, '/'], ['4', '4'], ['X', 9, 'F'],
+          ],
+        },
+      },
+    ]
+  end
 end

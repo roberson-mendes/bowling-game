@@ -142,7 +142,7 @@ module Bowling
             #if fouls
             actual_score = 'F' if actual_score == 0
             next_score = 'F' if next_score == 0
-            last_score = 'F' if last_score == 0 || last_score == nil
+            last_score = 'F' if last_score == 0
             
             if strike?(actual_chance)
                 @frames_scores['score_by_frame'] << ['X', next_score, 

@@ -26,13 +26,15 @@ RSpec.describe Main do
         input_validator = instance_double(Bowling::InputValidator)
         allow(input_validator).to receive(:validate)
         separated_score = { 
-          "Carl" => ["10", "10", "10", "10", "10", "10", "10", "10", "10", "10", "10", "10"] 
+          "Carl" => ["10", "10", "10", "10", "10", "10", "10", "10", "10", "10",
+            "10", "10"] 
         }
 
         subject = described_class.new(perfect, input_validator).read_file
 
         expect(subject).to eq({ 
-          "Carl" => ["10", "10", "10", "10", "10", "10", "10", "10", "10", "10", "10", "10"] }
+          "Carl" => ["10", "10", "10", "10", "10", "10", "10", "10", "10", "10",
+            "10", "10"] }
         )
       end
 
@@ -44,13 +46,15 @@ RSpec.describe Main do
           input_validator = instance_double(Bowling::InputValidator)
           allow(input_validator).to receive(:validate)
           separated_score = { 
-            "Carl" => ["10", "10", "10", "10", "10", "10", "10", "10", "10", "10", "10", "10"] 
+            "Carl" => ["10", "10", "10", "10", "10", "10", "10", "10", "10",
+              "10", "10", "10"] 
           }
   
           subject = described_class.new(perfect, input_validator).read_file
 
           expect(subject).to eq({ 
-            "Carl" => ["10", "10", "10", "10", "10", "10", "10", "10", "10", "10", "10", "10"] }
+            "Carl" => ["10", "10", "10", "10", "10", "10", "10", "10", "10",
+              "10", "10", "10"] }
           )
         end
 
