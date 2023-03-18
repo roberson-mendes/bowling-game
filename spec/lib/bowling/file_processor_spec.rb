@@ -20,10 +20,7 @@ RSpec.describe Bowling::FileProcessor do
 
         subject = described_class.new(perfect, input_validator_class).get_players_scores
 
-        expect(subject).to eq({
-                                "Carl" => ["10", "10", "10", "10", "10", "10",
-                                           "10", "10", "10", "10", "10", "10"],
-                              })
+        expect(subject).to eq(separated_score)
       end
     end
 

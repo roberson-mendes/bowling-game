@@ -3,26 +3,55 @@ require 'main'
 require 'bowling/validator/invalid_input_exception'
 require 'bowling/input_validator'
 require 'bowling/file_processor'
+require 'bowling/bowling_score_calculator'
 
 RSpec.describe Main do
   let(:perfect) { file_fixture('perfect.txt') }
   let(:scores) { file_fixture('scores.txt') }
   
   context 'when starts the program' do
-    it 'instantiate file processor' do
+    it 'process the file' do
       file_processor = spy(Bowling::FileProcessor)
+      bowling_score_calculator = class_double(Bowling::BowlingScoreCalculator)
+      bowling_score_calculator_instance = instance_double(Bowling::BowlingScoreCalculator)
+      allow(bowling_score_calculator).to receive(:new)
+        .with(anything)
+        .and_return(bowling_score_calculator_instance)
+      allow(bowling_score_calculator_instance).to receive(:calculate)
 
-      subject = described_class.new(perfect, file_processor).read_file
-      
-      expect(file_processor).to have_received(:new).with(perfect)
-    end
-
-    it 'calls fileprocessor get_players_scores to process the file' do
-      file_processor = spy(Bowling::FileProcessor)
-
-      subject = described_class.new(perfect, file_processor).read_file
+      subject = described_class.new(
+        perfect, 
+        file_processor: file_processor,
+        bowling_score_calculator: bowling_score_calculator
+      ).read_file
       
       expect(file_processor).to have_received(:get_players_scores)
+    end
+
+    it 'calculates the game rules to one player' do
+      bowling_score_calculator = class_double(Bowling::BowlingScoreCalculator)
+      bowling_score_calculator_instance = instance_double(Bowling::BowlingScoreCalculator)
+      player_scores = ["10", "10", "10", "10", "10", "10", "10", "10", "10",
+        "10", "10", "10"]
+      allow(bowling_score_calculator).to receive(:new)
+        .with(player_scores)
+        .and_return(bowling_score_calculator_instance)
+      allow(bowling_score_calculator_instance).to receive(:calculate)
+
+      subject = described_class.new(
+        perfect,
+        bowling_score_calculator: bowling_score_calculator
+      ).read_file
+      
+      expect(bowling_score_calculator).to have_received(:new)
+        .with(player_scores)
+    end
+
+    xit 'calculates the game rules to each palyer' do
+    end
+
+    xit 'prints the game score' do
+
     end
 
     context 'when input file is invalid' do
