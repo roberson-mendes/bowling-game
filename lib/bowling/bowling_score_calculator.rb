@@ -18,7 +18,6 @@ module Bowling
         "frames_score" => {},
         "score_by_frame" => [],
       }
-      @pinfalls_mapper
       @pinfalls_mapper = overrides.fetch(:score_mapper) do
         Bowling::PinfallsMapper
       end
@@ -39,53 +38,30 @@ module Bowling
 
     def calculate
       actual_chance = 0
-      actual_frame = 1
-
       until last_chance?(actual_chance)
         frame_score = 0
-        step_1 = 1
-        step_2 = 2
         frames = (1..10)
 
-        frames.each do |actual_frame|
-          unless last_frame?(actual_frame)
-            if strike?(actual_chance)
-              frame_score = @strike.score_for(actual_chance,
-                                              @chances)
-              @frames_scores["score_by_frame"] << ["strike", "X"]
-              actual_chance += step_1
-            elsif spare?(actual_chance)
-              frame_score = @spare.score_for(actual_chance,
-                                             @chances)
-              pinsfalls = @chances[actual_chance]
-              #convert to characters
-              pinfalls = "F" if pinfalls == 0
-              @frames_scores["score_by_frame"] << [pinsfalls, "/"]
-              actual_chance += step_2
-            else
-              frame_score = @regular.score_for(actual_chance,
-                                               @chances)
-              actual_pinsfalls = @chances[actual_chance]
-              next_pinsfalls = @chances[actual_chance + 1]
-              #convert into characteres
-              actual_pinsfalls = "F" if actual_pinsfalls == 0
-              next_pinsfalls = "F" if next_pinsfalls == 0
-              @frames_scores["score_by_frame"] <<
-                [actual_pinsfalls, next_pinsfalls]
-              actual_chance += step_2
-            end
-
-            @chances_validator.validate_next_chance(actual_chance)
-
-            @total_score += frame_score
-          end
-
+        frames.each do |actual_frame|          
           if last_frame?(actual_frame)
-            frame_score = score_for_last_frame(actual_chance)
+            frame_score = compute_last_frame_score(actual_chance)
             actual_chance = transform_to_last(actual_chance)
+          else
+            if strike?(actual_chance)
+              frame_score = compute_strike_frame_score(actual_chance)
+              actual_chance += 1
+            elsif spare?(actual_chance)
+              frame_score = compute_spare_frame_score(actual_chance)
+              actual_chance += 2
+            else
+              frame_score = compute_regular_frame_score(actual_chance)
+              actual_chance += 2
+            end
+            @chances_validator.validate_next_chance(actual_chance)
           end
-
-          build_frames_scores(actual_frame)
+          
+          adds_to_total_score(frame_score)
+          adds_to_frames_scores(actual_frame)
         end
       end
 
@@ -96,18 +72,6 @@ module Bowling
     end
 
     private
-
-    def transform_to_last(actual_chance)
-      skip_2_chances = actual_chance + 2
-      last_chance = skip_2_chances
-      actual_chance += last_chance
-    end
-
-    def last_chance?(chance)
-      last_chance = @chances.size - 1
-
-      chance >= last_chance
-    end
 
     def last_frame?(frame)
       last_frame = 10
@@ -124,71 +88,127 @@ module Bowling
       actual_pins_down = @chances[actual_chance]
 
       @chances_validator.validate_next_chance(actual_chance)
-      actual_pins_down + next_pins_down >= MAX_PINS
+      actual_pins_down + next_pins_down == MAX_PINS
     end
 
-    def score_for_last_frame(actual_chance)
-      frame_score = 0
-      actual_score = @chances[actual_chance]
-      skip_1 = actual_chance + 1
-      skip_2 = actual_chance + 2
-      next_score = @chances[skip_1]
-      last_score = @chances[skip_2]
+    def compute_strike_frame_score(actual_chance)
+      add_strike_frame
+      @strike.score_for(actual_chance,
+                        @chances)
+    end
+    
+    def compute_spare_frame_score(actual_chance)
+      add_spare_frame_score(actual_chance)
+      @spare.score_for(actual_chance,
+                       @chances)
+    end
 
-      #convert into characteres
-      #if strikes
-      actual_score = "X" if actual_score == 10
-      next_score = "X" if next_score == 10
-      last_score = "X" if last_score == 10
-      #if fouls
-      actual_score = "F" if actual_score == 0
-      next_score = "F" if next_score == 0
-      last_score = "F" if last_score == 0
+    def compute_regular_frame_score(actual_chance)
+      add_regular_frame_score(actual_chance)
+      @regular.score_for(actual_chance,
+                         @chances)
+    end
 
-      if strike?(actual_chance)
-        @frames_scores["score_by_frame"] << ["X", next_score,
-                                             last_score]
-        #convert into numbers to sum framescore
-        #if strikes
-        next_score = 10 if next_score == "X"
-        last_score = 10 if last_score == "X"
-        #if fouls
-        next_score = 0 if next_score == "F"
-        last_score = 0 if last_score == "F"
-        #increment frame_score
-        frame_score += STRIKE_SCORE + next_score + last_score
-        #increments bonus chance
-        @bonus_chances += 1
-      elsif spare?(actual_chance)
-        @frames_scores["score_by_frame"] << [actual_score, "/",
-                                             last_score]
-        #convert into numbers to sum framescore
-        #if strikes
-        last_score = 10 if last_score == "X"
-        #if fouls
-        last_score = 0 if last_score == "F"
-        #increment frame_score
-        frame_score += STRIKE_SCORE + last_score
-        #increments bonus chance
-        @bonus_chances += 1
-      else
-        @frames_scores["score_by_frame"] << [actual_score, next_score,
-                                             "F"]
-        #convert into numbers to sum framescore
-        #if strikes
-        actual_score = 10 if actual_score == "X"
-        next_score = 10 if next_score == "X"
-        #if fouls
-        actual_score = 0 if actual_score == "F"
-        next_score = 0 if next_score == "F"
-        #increment frame score
-        frame_score += actual_score + next_score
-      end
-
+    def adds_to_total_score(frame_score)
       @total_score += frame_score
     end
 
-    def build_frames_scores(actual_frame)
+    def last_chance?(chance)
+      last_chance = @chances.size - 1
+
+      chance >= last_chance
+    end
+
+    def transform_to_last(actual_chance)
+      skip_2_chances = actual_chance + 2
+      last_chance = skip_2_chances
+      actual_chance += last_chance
+    end
+
+    def add_strike_frame
+      @frames_scores["score_by_frame"] << ["strike", "X"]
+    end
+
+    def add_spare_frame_score(actual_chance)
+      pinsfalls = @chances[actual_chance]
+      pinfalls = @pinfalls_mapper.to_character(pinsfalls)
+      @frames_scores["score_by_frame"] << [pinsfalls, "/"]
+    end
+
+    def add_regular_frame_score(actual_chance)
+      pinfalls_characteres = convert_into_characteres(actual_chance)
+
+      @frames_scores["score_by_frame"] << [
+        pinfalls_characteres['actual_pinfalls'],
+        pinfalls_characteres['next_pinsfalls']
+      ]
+    end
+
+    def convert_into_characteres(actual_chance)
+      actual_pinfalls = @chances[actual_chance]
+      next_pinfalls = @chances[actual_chance + 1]
+
+      {
+        'actual_pinfalls' => @pinfalls_mapper.to_character(actual_pinfalls),
+        'next_pinsfalls' => @pinfalls_mapper.to_character(next_pinfalls)
+      }
+    end
+
+    def compute_last_frame_score(actual_chance)
+      actual_pinfalls = @chances[actual_chance]
+      next_pinfalls = @chances[actual_chance + 1]
+      last_pinfalls = @chances[actual_chance + 2]
+
+      if strike?(actual_chance)
+        build_last_frame_with_strike(actual_chance)
+        @bonus_chances += 1
+        return STRIKE_SCORE + next_pinfalls + last_pinfalls
+      elsif spare?(actual_chance)
+        build_last_frame_with_spare(actual_chance)
+        @bonus_chances += 1
+        return STRIKE_SCORE + last_pinfalls
+      else
+        build_last_frame_with_regular(actual_chance)
+        return actual_pinfalls + next_pinfalls
+      end
+    end
+
+    def build_last_frame_with_strike(actual_chance)
+      next_pinfalls = @chances[actual_chance + 1]
+      last_pinfalls = @chances[actual_chance + 2]
+
+      last_pinfalls = "/" if spare?(actual_chance + 1)
+      next_pinfalls = @pinfalls_mapper.to_character(next_pinfalls)
+      last_pinfalls = @pinfalls_mapper.to_character(next_pinfalls, last_pinfalls)
+
+      @frames_scores["score_by_frame"] << ["X", next_pinfalls,
+                                           last_pinfalls]
+    end
+
+    def build_last_frame_with_spare(actual_chance)
+      next_pinfalls = @chances[actual_chance + 1]
+      last_pinfalls = @chances[actual_chance + 2]
+
+      last_pinfalls = @pinfalls_mapper.to_character(last_pinfalls)
+
+      @frames_scores["score_by_frame"] << [actual_pinfalls, "/",
+                                           last_pinfalls]
+    end
+
+    def build_last_frame_with_regular(actual_chance)
+      actual_pinfalls = @chances[actual_chance]
+      next_pinfalls = @chances[actual_chance + 1]
+      last_pinfalls = @chances[actual_chance + 2]
+
+      actual_pinfalls = @pinfalls_mapper.to_character(actual_pinfalls)
+      next_pinfalls = @pinfalls_mapper.to_character(next_pinfalls)
+      last_pinfalls = @pinfalls_mapper.to_character(last_pinfalls)
+
+      @frames_scores["score_by_frame"] << [actual_pinfalls, next_pinfalls,
+                                           "-"]
+    end
+
+    def adds_to_frames_scores(actual_frame)
       @frames_scores["frames_score"][actual_frame] = @total_score
     end
   end
