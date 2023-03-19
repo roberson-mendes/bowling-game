@@ -1,6 +1,8 @@
 require 'bowling/file_processor'
 require 'bowling/bowling_score_calculator'
-require 'pry-byebug'
+require 'bowling/printer'
+require 'bowling/validator/invalid_input_exception'
+require 'logger'
 
 class Main
   def initialize(
@@ -14,63 +16,49 @@ class Main
     @bowling_score_calculator = overrides.fetch(:bowling_score_calculator) do
       Bowling::BowlingScoreCalculator
     end
+    @printer = overrides.fetch(:printer) do
+      Bowling::Printer.new
+    end
+    @logger = overrides.fetch(:logger) do
+      Logger.new(STDOUT)
+    end
   end
 
   def read_file
-    players_pinfalls = @file_processor.get_players_scores
-    #calculate the players scores
-    #separate it in an iterator pattern
+    begin
+      players_pinfalls = @file_processor.get_players_scores
+      players_scores = calculate_players_scores(players_pinfalls)
+      @printer.print_game_result(players_scores)
+    rescue Bowling::Validator::InvalidInputException => error
+      print ("\n Invalid file: #{error.message}")
+      @logger.error(error.backtrace)
+      raise error
+    rescue => error
+      print ("\n Some problem ocurred. The problem is: #{ error.message }")
+      @logger.error("\nThe error stacktrace is: #{error.backtrace}\n")
+      raise error
+    end
+  end
+  
+  private
+  
+  def calculate_players_scores(players_pinfalls)
     players_scores = []
-    pinfalls = players_pinfalls.first[1]
-    @bowling_score_calculator.new(pinfalls).calculate
-      #entrada: ["10", "7", "3", "9", "0", "10", "0", "8", "8", "2", "0", "6",
-      # "10", "10", "10", "8", "1"]
-      
-      #saída: 
-      # "frames_score" => {
-      #   1 => 20,
-      #   2 => 39,
-      #   3 => 48,
-      #   4 => 66,
-      #   5 => 74,
-      #   6 => 84,
-      #   7 => 90,
-      #   8 => 120,
-      #   9 => 148,
-      #   10 => 167,
-      # },
-      # "score_by_frame" => [["strike", "X"], [7, "/"], [9, "F"],
-      #                      ["strike", "X"], ["F", 8], [8, "/"], ["F", 6], 
-      #                      ["strike", "X"], ["strike", "X"], ["X", 8, 1]],
-      # }
+    
+    players_pinfalls.each do |name, pinfalls|
+      bowling_score = @bowling_score_calculator.new.calculate(pinfalls)
+      player_score = build_players_scores(name, bowling_score)
+      # add_player to players scores
+      players_scores << player_score
+    end
+    
+    players_scores
+  end
 
-      #saída final:
-      # [
-      #   {
-      #     "name" => "Carl",
-      #     "scores" => {
-      #       "frames_score" => {
-      #         1 => 30,
-      #         2 => 60,
-      #         3 => 90,
-      #         4 => 120,
-      #         5 => 150,
-      #         6 => 180,
-      #         7 => 210,
-      #         8 => 240,
-      #         9 => 270,
-      #         10 => 300
-      #       },
-      #       "score_by_frame" => [
-      #         ["strike", "X"], ["strike", "X"],
-      #         ["strike", "X"], ["strike", "X"],
-      #         ["strike", "X"], ["strike", "X"],
-      #         ["strike", "X"], ["strike", "X"],
-      #         ["strike", "X"], ["X", "X", "X"],
-      #       ],
-      #     },
-      #   },
-      # ]
-    #print computed scores
+  def build_players_scores(name, bowling_score)
+    player_score = {
+      'name' => name,
+      'scores' => bowling_score
+    }
   end
 end

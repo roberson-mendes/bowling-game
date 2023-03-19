@@ -1,5 +1,4 @@
 require "bowling/input_validator"
-require "pry-byebug"
 
 module Bowling
   class FileProcessor

@@ -1,16 +1,18 @@
-require "pry-byebug"
-
 module Bowling
   class Printer
-    def initialize(players_final_scores = nil)
+    def print_game_result(players_final_scores = nil)
       @players_final_scores = players_final_scores
-    end
 
-    def print
-      print_frame_head
-        .concat(print_players_name)
-        .concat(print_pinfalls)
-        .concat(print_score_display)
+      display = print_frame_head
+
+      @players_final_scores.each do |player|
+        display
+          .concat(print_players_name(player))
+          .concat(print_pinfalls(player))
+          .concat(print_score_display(player))
+      end
+
+      display
     end
 
     private
@@ -19,21 +21,21 @@ module Bowling
       "Frame\t\t1\t\t2\t\t3\t\t4\t\t5\t\t6\t\t7\t\t8\t\t9\t\t10\n"
     end
 
-    def print_players_name
-      "#{@players_final_scores[0]["name"]}\n"
+    def print_players_name(player)
+      "#{player["name"]}\n"
     end
 
-    def print_pinfalls
+    def print_pinfalls(player)
       display = "Pinfalls"
 
-      @players_final_scores.each do |player|
-        player.dig("scores", "score_by_frame").each do |frame|
-          frame.each do |pinfalls|
-            if pinfalls == "strike"
-              display << "\t\t"
-            else
-              display << "\t#{pinfalls}" unless pinfalls == nil
-            end
+      player.dig("scores", "score_by_frame").each do |frame|
+        frame.each do |pinfalls|
+          if pinfalls == "strike"
+            display << "\t\t"
+          elsif pinfalls == nil
+            display << "\t-"
+          else
+            display << "\t#{pinfalls}"
           end
         end
       end
@@ -41,13 +43,11 @@ module Bowling
       display + "\n"
     end
 
-    def print_score_display
+    def print_score_display(player)
       display = "Score"
 
-      @players_final_scores.each do |player|
-        player.dig("scores", "frames_score").each do |frame, score|
-          display << "\t\t#{score}"
-        end
+      player.dig("scores", "frames_score").each do |frame, score|
+        display << "\t\t#{score}"
       end
 
       display + "\n"

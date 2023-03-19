@@ -3,7 +3,6 @@ require "bowling/pinfalls_mapper"
 require "bowling/bowling_score_strategy/strike"
 require "bowling/bowling_score_strategy/spare"
 require "bowling/bowling_score_strategy/regular"
-require "pry-byebug"
 
 module Bowling
   class BowlingScoreCalculator
@@ -11,7 +10,7 @@ module Bowling
     STRIKE_SCORE = 10
     MAX_CHANCES = 20
 
-    def initialize(chances, overrides = {})
+    def initialize(overrides = {})
       @bonus_chances = 0
       @total_score = 0
       @frames_scores = {
@@ -21,9 +20,8 @@ module Bowling
       @pinfalls_mapper = overrides.fetch(:score_mapper) do
         Bowling::PinfallsMapper
       end
-      @chances = @pinfalls_mapper.to_numbers(chances)
       @chances_validator = overrides.fetch(:chances_validator) do
-        Bowling::ChancesValidator.new(@chances)
+        Bowling::ChancesValidator.new
       end
       @strike = overrides.fetch(:strike) do
         Bowling::BowlingScoreStrategy::Strike.new
@@ -36,7 +34,9 @@ module Bowling
       end
     end
 
-    def calculate
+    def calculate(chances)
+      @chances = @pinfalls_mapper.to_numbers(chances)
+
       actual_chance = 0
       until last_chance?(actual_chance)
         frame_score = 0
@@ -57,7 +57,8 @@ module Bowling
               frame_score = compute_regular_frame_score(actual_chance)
               actual_chance += 2
             end
-            @chances_validator.validate_next_chance(actual_chance)
+
+            @chances_validator.validate_next_chance(@chances, actual_chance)
           end
           
           adds_to_total_score(frame_score)
@@ -87,7 +88,7 @@ module Bowling
       next_pins_down = @chances[actual_chance + 1]
       actual_pins_down = @chances[actual_chance]
 
-      @chances_validator.validate_next_chance(actual_chance)
+      @chances_validator.validate_next_chance(@chances, actual_chance)
       actual_pins_down + next_pins_down == MAX_PINS
     end
 

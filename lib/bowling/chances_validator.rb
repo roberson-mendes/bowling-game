@@ -4,11 +4,9 @@ module Bowling
         MAX_CHANCES = 20
         STRIKE_SCORE = 10
       
-        def initialize(scores)
+        def validate_next_chance(scores, actual_chance)
           @scores = scores
-        end
-      
-        def validate_next_chance(actual_chance)
+          
           actual_pins = @scores[actual_chance]
           next_pins = @scores[actual_chance + 1]
           raise "Less chances then the required by bowling rules." if less_chances?(actual_pins)
@@ -17,7 +15,6 @@ module Bowling
       
         def validate_chances_quantity(strikes, bonus_chances)
           chances_quantity = @scores.size
-          # binding.pry
           actual_max_chances = (MAX_CHANCES - strikes + bonus_chances)
 
           if chances_quantity > actual_max_chances
