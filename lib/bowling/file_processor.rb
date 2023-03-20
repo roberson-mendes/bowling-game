@@ -1,4 +1,4 @@
-require "bowling/input_validator"
+require_relative "input_validator"
 
 module Bowling
   class FileProcessor

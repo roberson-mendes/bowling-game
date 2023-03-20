@@ -1,8 +1,8 @@
-require "bowling/chances_validator"
-require "bowling/pinfalls_mapper"
-require "bowling/bowling_score_strategy/strike"
-require "bowling/bowling_score_strategy/spare"
-require "bowling/bowling_score_strategy/regular"
+require_relative "chances_validator"
+require_relative "pinfalls_mapper"
+require_relative "bowling_score_strategy/strike"
+require_relative "bowling_score_strategy/spare"
+require_relative "bowling_score_strategy/regular"
 
 module Bowling
   class BowlingScoreCalculator

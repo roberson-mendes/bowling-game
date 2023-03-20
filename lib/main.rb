@@ -1,8 +1,8 @@
-require 'bowling/file_processor'
-require 'bowling/bowling_score_calculator'
-require 'bowling/printer'
-require 'bowling/validator/invalid_input_exception'
-require 'bowling_game'
+require_relative 'bowling/file_processor'
+require_relative 'bowling/bowling_score_calculator'
+require_relative 'bowling/printer'
+require_relative 'bowling/validator/invalid_input_exception'
+require_relative 'bowling_game'
 require 'logger'
 
 class Main
