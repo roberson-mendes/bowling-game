@@ -28,7 +28,7 @@ class Main
     begin
       players_pinfalls = @file_processor.get_players_scores
       players_scores = calculate_players_scores(players_pinfalls)
-      @printer.print_game_result(players_scores)
+      print @printer.print_game_result(players_scores)
     rescue Bowling::Validator::InvalidInputException => error
       print ("\n Invalid file: #{error.message}")
       @logger.error(error.backtrace)

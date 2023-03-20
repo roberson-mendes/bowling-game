@@ -72,9 +72,9 @@ RSpec.describe Main do
 
       subject = described_class.new(
         regular
-      ).read_file
+      )
 
-      expect(subject).to eq(expected_display)
+      expect { subject.read_file }.to output(expected_display).to_stdout
     end
 
     context 'when input file is valid' do
@@ -86,9 +86,9 @@ RSpec.describe Main do
       
               subject = described_class.new(
                 perfect
-              ).read_file
+              )
         
-              expect(subject).to eq(expected_display)
+              expect { subject.read_file }.to output(expected_display).to_stdout
             end
           end
           
@@ -98,9 +98,9 @@ RSpec.describe Main do
       
               subject = described_class.new(
                 fouls
-              ).read_file
+              )
         
-              expect(subject).to eq(expected_display)
+              expect { subject.read_file }.to output(expected_display).to_stdout
             end
           end
         end
@@ -113,9 +113,9 @@ RSpec.describe Main do
       
           subject = described_class.new(
             three
-          ).read_file
+          )
     
-          expect(subject).to eq(expected_display)
+          expect { subject.read_file }.to output(expected_display).to_stdout
         end
       end
     end
