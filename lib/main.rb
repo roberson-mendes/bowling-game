@@ -41,3 +41,7 @@ class Main
     end
   end
 end
+
+
+path_name = Pathname.new(Pathname.getwd).join('scores.txt')
+Main.new(path_name).read_file
