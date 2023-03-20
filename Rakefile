@@ -1,6 +1,5 @@
 require 'pathname'
 
 task :run do
-  cd 'lib'
-  ruby 'main.rb'
+  Dir.chdir('lib') { ruby 'main.rb' }
 end
