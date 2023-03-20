@@ -36,22 +36,21 @@ RSpec.describe Main do
     end
 
     it 'calculates the game rules for one player' do
-      bowling_score_calculator = class_double(Bowling::BowlingScoreCalculator)
-      bowling_score_instance = spy(Bowling::BowlingScoreCalculator)
-      player_scores = ["10", "10", "10", "10", "10", "10", "10", "10", "10",
-        "10", "10", "10"]
+      bowling_game = spy(Bowling::BowlingScoreCalculator)
+      player_scores = {
+        "Carl" => ["10", "10", "10", "10", "10", "10", "10", "10", "10","10",
+                   "10", "10"]
+      }
       printer = instance_double(Bowling::Printer)
-      allow(bowling_score_calculator).to receive(:new)
-        .and_return(bowling_score_instance)
       allow(printer).to receive(:print_game_result).with(anything)
 
       subject = described_class.new(
         perfect,
-        bowling_score_calculator: bowling_score_calculator,
+        bowling_game: bowling_game,
         printer: printer
       ).read_file
       
-      expect(bowling_score_instance).to have_received(:calculate)
+      expect(bowling_game).to have_received(:calculate_players_scores)
         .with(player_scores)
     end
 
