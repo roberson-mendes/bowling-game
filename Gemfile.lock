@@ -16,6 +16,7 @@ GEM
       byebug (~> 11.0)
       pry (>= 0.13, < 0.15)
     rainbow (3.0.0)
+    rake (13.0.6)
     regexp_parser (2.1.1)
     rexml (3.2.5)
     rspec (3.10.0)
@@ -54,6 +55,7 @@ PLATFORMS
 DEPENDENCIES
   pry
   pry-byebug
+  rake
   rspec
   rubocop (~> 1.16)
   rubocop-rspec (~> 2.3.0)
