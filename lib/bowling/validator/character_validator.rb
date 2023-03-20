@@ -7,8 +7,10 @@ module Bowling
 
       def validate
         @results_file_path.each_line do |line|
-          raise Bowling::Validator::InvalidInputException
-            .with_characteres_error unless expected_format?(line)
+          unless expected_format?(line)
+            raise Bowling::Validator::InvalidInputException
+              .with_characteres_error
+          end
         end
       end
 

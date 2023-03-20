@@ -22,35 +22,35 @@ module Bowling
     end
 
     def print_players_name(player)
-      "#{player["name"]}\n"
+      "#{player['name']}\n"
     end
 
     def print_pinfalls(player)
-      display = "Pinfalls"
+      display = 'Pinfalls'
 
-      player.dig("scores", "score_by_frame").each do |frame|
+      player.dig('scores', 'score_by_frame').each do |frame|
         frame.each do |pinfalls|
-          if pinfalls == "strike"
-            display << "\t\t"
-          elsif pinfalls == nil
-            display << "\t-"
-          else
-            display << "\t#{pinfalls}"
-          end
+          display << if pinfalls == 'strike'
+                       "\t\t"
+                     elsif pinfalls.nil?
+                       "\t-"
+                     else
+                       "\t#{pinfalls}"
+                     end
         end
       end
 
-      display + "\n"
+      "#{display}\n"
     end
 
     def print_score_display(player)
-      display = "Score"
+      display = 'Score'
 
-      player.dig("scores", "frames_score").each do |frame, score|
+      player.dig('scores', 'frames_score').each do |_frame, score|
         display << "\t\t#{score}"
       end
 
-      display + "\n"
+      "#{display}\n"
     end
   end
 end

@@ -1,6 +1,6 @@
-require_relative "validator/file_content_validator"
-require_relative "validator/character_validator"
-require_relative "validator/score_validator"
+require_relative 'validator/file_content_validator'
+require_relative 'validator/character_validator'
+require_relative 'validator/score_validator'
 
 module Bowling
   class InputValidator
@@ -15,7 +15,7 @@ module Bowling
     end
 
     def validate
-      @validators.each { |validator| validator.validate }
+      @validators.each(&:validate)
     end
   end
 end

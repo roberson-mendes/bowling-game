@@ -1,8 +1,8 @@
-require_relative "chances_validator"
-require_relative "pinfalls_mapper"
-require_relative "bowling_score_strategy/strike"
-require_relative "bowling_score_strategy/spare"
-require_relative "bowling_score_strategy/regular"
+require_relative 'chances_validator'
+require_relative 'pinfalls_mapper'
+require_relative 'bowling_score_strategy/strike'
+require_relative 'bowling_score_strategy/spare'
+require_relative 'bowling_score_strategy/regular'
 
 module Bowling
   class BowlingScoreCalculator
@@ -14,8 +14,8 @@ module Bowling
       @bonus_chances = 0
       @total_score = 0
       @frames_scores = {
-        "frames_score" => {},
-        "score_by_frame" => [],
+        'frames_score' => {},
+        'score_by_frame' => []
       }
       @pinfalls_mapper = overrides.fetch(:score_mapper) do
         Bowling::PinfallsMapper
@@ -42,7 +42,7 @@ module Bowling
         frame_score = 0
         frames = (1..10)
 
-        frames.each do |actual_frame|          
+        frames.each do |actual_frame|
           if last_frame?(actual_frame)
             frame_score = compute_last_frame_score(actual_chance)
             actual_chance = transform_to_last(actual_chance)
@@ -60,7 +60,7 @@ module Bowling
 
             @chances_validator.validate_next_chance(@chances, actual_chance)
           end
-          
+
           adds_to_total_score(frame_score)
           adds_to_frames_scores(actual_frame)
         end
@@ -97,7 +97,7 @@ module Bowling
       @strike.score_for(actual_chance,
                         @chances)
     end
-    
+
     def compute_spare_frame_score(actual_chance)
       add_spare_frame_score(actual_chance)
       @spare.score_for(actual_chance,
@@ -123,23 +123,22 @@ module Bowling
     def transform_to_last(actual_chance)
       skip_2_chances = actual_chance + 2
       last_chance = skip_2_chances
-      actual_chance += last_chance
+      actual_chance + last_chance
     end
 
     def add_strike_frame
-      @frames_scores["score_by_frame"] << ["strike", "X"]
+      @frames_scores['score_by_frame'] << %w[strike X]
     end
 
     def add_spare_frame_score(actual_chance)
       pinsfalls = @chances[actual_chance]
-      pinfalls = @pinfalls_mapper.to_character(pinsfalls)
-      @frames_scores["score_by_frame"] << [pinsfalls, "/"]
+      @frames_scores['score_by_frame'] << [pinsfalls, '/']
     end
 
     def add_regular_frame_score(actual_chance)
       pinfalls_characteres = convert_into_characteres(actual_chance)
 
-      @frames_scores["score_by_frame"] << [
+      @frames_scores['score_by_frame'] << [
         pinfalls_characteres['actual_pinfalls'],
         pinfalls_characteres['next_pinsfalls']
       ]
@@ -163,14 +162,14 @@ module Bowling
       if strike?(actual_chance)
         build_last_frame_with_strike(actual_chance)
         @bonus_chances += 1
-        return STRIKE_SCORE + next_pinfalls + last_pinfalls
+        STRIKE_SCORE + next_pinfalls + last_pinfalls
       elsif spare?(actual_chance)
         build_last_frame_with_spare(actual_chance)
         @bonus_chances += 1
-        return STRIKE_SCORE + last_pinfalls
+        STRIKE_SCORE + last_pinfalls
       else
         build_last_frame_with_regular(actual_chance)
-        return actual_pinfalls + next_pinfalls
+        actual_pinfalls + next_pinfalls
       end
     end
 
@@ -178,39 +177,36 @@ module Bowling
       next_pinfalls = @chances[actual_chance + 1]
       last_pinfalls = @chances[actual_chance + 2]
 
-      last_pinfalls = "/" if spare?(actual_chance + 1)
+      last_pinfalls = '/' if spare?(actual_chance + 1)
       next_pinfalls = @pinfalls_mapper.to_character(next_pinfalls)
       last_pinfalls = @pinfalls_mapper.to_character(next_pinfalls, last_pinfalls)
 
-      @frames_scores["score_by_frame"] << ["X", next_pinfalls,
+      @frames_scores['score_by_frame'] << ['X', next_pinfalls,
                                            last_pinfalls]
     end
 
     def build_last_frame_with_spare(actual_chance)
-      next_pinfalls = @chances[actual_chance + 1]
       last_pinfalls = @chances[actual_chance + 2]
 
       last_pinfalls = @pinfalls_mapper.to_character(last_pinfalls)
 
-      @frames_scores["score_by_frame"] << [actual_pinfalls, "/",
+      @frames_scores['score_by_frame'] << [actual_pinfalls, '/',
                                            last_pinfalls]
     end
 
     def build_last_frame_with_regular(actual_chance)
       actual_pinfalls = @chances[actual_chance]
       next_pinfalls = @chances[actual_chance + 1]
-      last_pinfalls = @chances[actual_chance + 2]
 
       actual_pinfalls = @pinfalls_mapper.to_character(actual_pinfalls)
       next_pinfalls = @pinfalls_mapper.to_character(next_pinfalls)
-      last_pinfalls = @pinfalls_mapper.to_character(last_pinfalls)
 
-      @frames_scores["score_by_frame"] << [actual_pinfalls, next_pinfalls,
-                                           "-"]
+      @frames_scores['score_by_frame'] << [actual_pinfalls, next_pinfalls,
+                                           '-']
     end
 
     def adds_to_frames_scores(actual_frame)
-      @frames_scores["frames_score"][actual_frame] = @total_score
+      @frames_scores['frames_score'][actual_frame] = @total_score
     end
   end
 end

@@ -7,11 +7,11 @@ module Bowling
     def self.to_numbers(pinfalls)
       converted = []
       pinfalls.each_with_index do |pinsfall, idx|
-        if pinsfall == "x" || pinsfall == "X"
+        if %w[x X].include?(pinsfall)
           converted << 10
-        elsif pinsfall == "f" || pinsfall == "F"
+        elsif %w[f F].include?(pinsfall)
           converted << 0
-        elsif pinsfall == "/"
+        elsif pinsfall == '/'
           previous_pinsfall = pinfalls[idx - 1]
           pinsfall = MAX_PINS - previous_pinsfall
           converted << pinsfall
@@ -23,10 +23,11 @@ module Bowling
       converted
     end
 
-    def self.to_character(previous_pinfalls = nil, actual_pinfalls)
-      return "F" if actual_pinfalls == FOUL
-      return "X" if actual_pinfalls == STRIKE_SCORE 
-      return actual_pinfalls
+    def self.to_character(_previous_pinfalls = nil, actual_pinfalls)
+      return 'F' if actual_pinfalls == FOUL
+      return 'X' if actual_pinfalls == STRIKE_SCORE
+
+      actual_pinfalls
     end
   end
 end

@@ -1,4 +1,4 @@
-require_relative "input_validator"
+require_relative 'input_validator'
 
 module Bowling
   class FileProcessor
@@ -10,35 +10,35 @@ module Bowling
       @input_validator = input_validator.new(@file_path)
     end
 
-    def get_players_scores
+    def players_scores
       @input_validator.validate
-      get_players
+      players
     end
 
     private
 
-    def get_players
+    def players
       players_scores = {}
 
       @file_path.each_line do |line|
-        players_info = get_player(line)
-        get_or_initialize_score(players_scores, players_info)
+        players_info = player(line)
+        score(players_scores, players_info)
         add_score_to_player(players_scores, players_info)
       end
 
       players_scores
     end
-    
-    def get_player(line)
+
+    def player(line)
       player_infos = line.chomp.split("\t")
 
       {
         name: player_infos[0],
-        pins: player_infos[1],
+        pins: player_infos[1]
       }
     end
 
-    def get_or_initialize_score(players_score, players_info)
+    def score(players_score, players_info)
       players_score[players_info[:name]] ||= []
     end
 

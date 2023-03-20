@@ -6,8 +6,10 @@ module Bowling
       end
 
       def validate
+        return unless @results_file_path.empty?
+
         raise Bowling::Validator::InvalidInputException
-          .with_blank_error if @results_file_path.empty?
+          .with_blank_error
       end
     end
   end

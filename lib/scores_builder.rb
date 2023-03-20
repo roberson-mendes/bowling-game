@@ -1,7 +1,7 @@
 require_relative 'bowling/bowling_score_calculator'
 
 class ScoresBuilder
-  def initialize(overrides={})
+  def initialize(overrides = {})
     @bowling_score_calculator = overrides.fetch(:bowling_score_calculator) do
       Bowling::BowlingScoreCalculator
     end
@@ -23,9 +23,9 @@ class ScoresBuilder
   private
 
   def build_player_scores(name, bowling_score)
-    player_score = {
-      "name" => name,
-      "scores" => bowling_score,
+    {
+      'name' => name,
+      'scores' => bowling_score
     }
   end
 end
