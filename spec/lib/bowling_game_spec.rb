@@ -1,19 +1,21 @@
 require 'spec_helper'
-require 'main'
+require 'bowling_game'
+require 'scores_builder'
 require 'bowling/validator/invalid_input_exception'
 require 'bowling/input_validator'
 require 'bowling/file_processor'
 require 'bowling/bowling_score_calculator'
+require 'bowling/printer'
 
-RSpec.describe Main do
+RSpec.describe BowlingGame do
   let(:perfect) { file_fixture('perfect.txt') }
   let(:scores) { file_fixture('scores.txt') }
   let(:regular) { file_fixture('regular.txt') }
   let(:free_text) { file_fixture('free-text.txt') }
   let(:fouls) { file_fixture('fouls.txt') }
   let(:three) { file_fixture('three.txt') }
-  
-  context 'when starts the program' do
+
+  context 'when starts the game' do 
     it 'process the file' do
       file_processor = spy(Bowling::FileProcessor)
       bowling_score_calculator = class_double(Bowling::BowlingScoreCalculator)
@@ -23,20 +25,20 @@ RSpec.describe Main do
         .and_return(bowling_score_instance)
       allow(bowling_score_instance).to receive(:calculate)
         .with(anything)
-      allow(printer).to receive(:print_game_result).with(anything)
-
+  
       subject = described_class.new(
         perfect, 
         file_processor: file_processor,
-        bowling_score_calculator: bowling_score_calculator, 
-        printer: printer
-      ).read_file
+        bowling_score_calculator: bowling_score_calculator
+      ).process_game_file
       
       expect(file_processor).to have_received(:get_players_scores)
     end
-
+  end
+  
+  context 'when starts the program' do
     it 'calculates the game rules for one player' do
-      bowling_game = spy(Bowling::BowlingScoreCalculator)
+      scores_builder = spy(ScoresBuilder)
       player_scores = {
         "Carl" => ["10", "10", "10", "10", "10", "10", "10", "10", "10","10",
                    "10", "10"]
@@ -46,12 +48,11 @@ RSpec.describe Main do
 
       subject = described_class.new(
         perfect,
-        bowling_game: bowling_game,
+        scores_builder: scores_builder,
         printer: printer
-      ).read_file
+      ).process_game_file
       
-      expect(bowling_game).to have_received(:calculate_players_scores)
-        .with(player_scores)
+      expect(scores_builder).to have_received(:build_players_scores)
     end
 
     it 'prints the game results' do
@@ -60,7 +61,7 @@ RSpec.describe Main do
       subject = described_class.new(
         perfect,
         printer: printer
-      ).read_file
+      ).process_game_file
       
       expect(printer).to have_received(:print_game_result)
         .with(perfect_player)
@@ -73,7 +74,7 @@ RSpec.describe Main do
         regular
       )
 
-      expect { subject.read_file }.to output(expected_display).to_stdout
+      expect { subject.process_game_file }.to output(expected_display).to_stdout
     end
 
     context 'when input file is valid' do
@@ -87,7 +88,7 @@ RSpec.describe Main do
                 perfect
               )
         
-              expect { subject.read_file }.to output(expected_display).to_stdout
+              expect { subject.process_game_file }.to output(expected_display).to_stdout
             end
           end
           
@@ -99,7 +100,7 @@ RSpec.describe Main do
                 fouls
               )
         
-              expect { subject.read_file }.to output(expected_display).to_stdout
+              expect { subject.process_game_file }.to output(expected_display).to_stdout
             end
           end
         end
@@ -114,7 +115,7 @@ RSpec.describe Main do
             three
           )
     
-          expect { subject.read_file }.to output(expected_display).to_stdout
+          expect { subject.process_game_file }.to output(expected_display).to_stdout
         end
       end
     end
